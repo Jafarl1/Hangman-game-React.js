@@ -2,10 +2,16 @@
 import { useState } from "react";
 import Hangman from "./components/hangman/hangman.jsx";
 
+import "./styles/styles.css";
+
 function App() {
   return (
     <>
-      <Hangman />
+      <div className="app">
+        <div className="wrap">
+          <Hangman />
+        </div>
+      </div>
     </>
   );
 }

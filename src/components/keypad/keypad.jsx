@@ -1,15 +1,18 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import styles from "./keypad.module.css";
 
-function Keypad() {
+function Keypad({ currentLetter, current }) {
   const [keypadBoard, setKeypadBoard] = useState([
     ..."qwertyuiopasdfghjklzxcvbnm",
   ]);
 
   const handleClickOnKeypad = (e) => {
     const value = e.target.innerHTML;
+    currentLetter(current, value);
   };
+
   return (
     <>
       <div className={styles.keypad}>
@@ -24,12 +27,6 @@ function Keypad() {
               {letter}
             </div>
           ))}
-          <div
-            className={`${styles.letter} ${styles.del}`}
-            onClick={handleClickOnKeypad}
-          >
-            del
-          </div>
         </div>
       </div>
     </>
