@@ -3,27 +3,31 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 30px;
+  gap: 20px;
   padding: 20px;
 
+  .hangmanImage {
+    height: 150px;
+  }
+
   .life {
+    height: 30px;
     display: flex;
     gap: 15px;
 
     .image {
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
     }
   }
   .field {
     display: flex;
     height: 50px;
     gap: 10px;
-    margin-bottom: 40px;
 
     .cell {
-      width: 40px;
-      height: 40px;
+      width: 30px;
+      height: 30px;
       border-bottom: 2px solid black;
       display: flex;
       justify-content: center;
@@ -33,5 +37,11 @@
       font-weight: bold;
       color: rgb(0, 158, 45);
     }
+  }
+}
+
+@media screen and (max-width: 530px) {
+  .hangman {
+    gap: 10px;
   }
 }
