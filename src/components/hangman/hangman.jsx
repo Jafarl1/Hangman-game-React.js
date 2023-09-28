@@ -3,43 +3,63 @@
 import Keypad from "../keypad/keypad.jsx";
 import { useState, useEffect } from "react";
 import { list } from "../../db.js";
+
+import { hangmanImages } from "./hangmanImages.js";
+
 import heart from "../../assets/images/heart.png";
 import restart from "../../assets/images/restart.png";
-import hangman0 from "../../assets/svg/hangman-0.svg";
-import hangman1 from "../../assets/svg/hangman-1.svg";
-import hangman2 from "../../assets/svg/hangman-2.svg";
-import hangman4 from "../../assets/svg/hangman-4.svg";
-import hangman6 from "../../assets/svg/hangman-6.svg";
 
 import styles from "./hangman.module.css";
 
 function Hangman() {
   const [currentWordObject, setCurrentWordObject] = useState("");
   const [array, setArray] = useState([]);
+  const [gameLevel, setGameLevel] = useState("easy");
+  const [gameStarted, setGameStarted] = useState(false);
   const [chancesRemaining, setChancesRemaining] = useState([]);
   const [wrongLimit, setWrongLimit] = useState(0);
   const [mistakes, setMistakes] = useState([]);
-  const [currentImage, setCurrentImage] = useState(hangman0);
+  const [currentImage, setCurrentImage] = useState(hangmanImages[0]);
 
   useEffect(() => {
     newGame();
   }, []);
 
   useEffect(() => {
+    if (currentWordObject && currentWordObject.word.length > 10) {
+      newGame();
+    }
+
     if (currentWordObject) {
       const length = currentWordObject.word.length;
-      const maxWrongs = Math.floor(length * 0.5);
+      const maxWrongs = determineLimit(gameLevel, length);
       setArray(Array(length).fill(""));
       setChancesRemaining(Array(maxWrongs).fill(""));
       setWrongLimit(maxWrongs);
     }
-  }, [currentWordObject]);
+  }, [currentWordObject, gameLevel]);
 
   function newGame() {
-    setCurrentImage(hangman0);
-    setMistakes([]);
     const randomIndex = Math.floor(Math.random() * list.length);
     setCurrentWordObject(list[randomIndex]);
+    setCurrentImage(hangmanImages[0]);
+    setMistakes([]);
+    setGameStarted(false);
+  }
+
+  function determineLimit(level, length) {
+    if (level === "easy") {
+      return Math.ceil(length * 0.6);
+    } else if (level === "medium") {
+      return Math.ceil(length * 0.4);
+    } else if (level === "hard") {
+      return Math.ceil(length * 0.2);
+    }
+  }
+
+  function selectLevel(e) {
+    const level = e.target.value;
+    setGameLevel(level.toLowerCase());
   }
 
   function decreaseLimit() {
@@ -48,53 +68,53 @@ function Hangman() {
   }
 
   function gallowDrawing(limit, chances) {
-    if (limit === 4) {
-      switch (chances) {
-        case 3:
-          setCurrentImage(hangman1);
-          break;
-        case 2:
-          setCurrentImage(hangman2);
-          break;
-        case 1:
-          setCurrentImage(hangman4);
-          break;
-        case 0:
-          setCurrentImage(hangman6);
-          endOfTheGame("lost");
-          break;
-        default:
-          setCurrentImage(hangman0);
-          break;
-      }
+    let hangmanImagesArray;
+
+    if (limit === 6) {
+      hangmanImagesArray = {
+        5: hangmanImages[1],
+        4: hangmanImages[2],
+        3: hangmanImages[3],
+        2: hangmanImages[4],
+        1: hangmanImages[5],
+        0: hangmanImages[6],
+      };
+    } else if (limit === 5) {
+      hangmanImagesArray = {
+        4: hangmanImages[1],
+        3: hangmanImages[2],
+        2: hangmanImages[3],
+        1: hangmanImages[4],
+        0: hangmanImages[6],
+      };
+    } else if (limit === 4) {
+      hangmanImagesArray = {
+        3: hangmanImages[1],
+        2: hangmanImages[2],
+        1: hangmanImages[4],
+        0: hangmanImages[6],
+      };
     } else if (limit === 3) {
-      switch (chances) {
-        case 2:
-          setCurrentImage(hangman1);
-          break;
-        case 1:
-          setCurrentImage(hangman4);
-          break;
-        case 0:
-          setCurrentImage(hangman6);
-          endOfTheGame("lost");
-          break;
-        default:
-          setCurrentImage(hangman0);
-          break;
-      }
+      hangmanImagesArray = {
+        2: hangmanImages[1],
+        1: hangmanImages[4],
+        0: hangmanImages[6],
+      };
     } else if (limit === 2) {
-      switch (chances) {
-        case 1:
-          setCurrentImage(hangman1);
-          break;
-        case 0:
-          setCurrentImage(hangman6);
-          endOfTheGame("lost");
-          break;
-        default:
-          setCurrentImage(hangman0);
-          break;
+      hangmanImagesArray = {
+        1: hangmanImages[1],
+        0: hangmanImages[6],
+      };
+    } else if (limit === 1) {
+      hangmanImagesArray = {
+        0: hangmanImages[6],
+      };
+    }
+
+    if (chances in hangmanImagesArray) {
+      setCurrentImage(hangmanImagesArray[chances]);
+      if (chances === 0) {
+        endOfTheGame("lost");
       }
     }
   }
@@ -107,6 +127,7 @@ function Hangman() {
   }
 
   function currentLetter(currentWordObject, letter) {
+    setGameStarted(true);
     const newArray = [...array];
 
     if (
@@ -131,7 +152,20 @@ function Hangman() {
   return (
     <>
       <div className={styles.hangman}>
-        <div>
+        <div className={styles.gameTable}>
+          <div className={styles.levelArea}>
+            <h3 className={styles.levelH2}>level</h3>
+            <select
+              name="level"
+              className={styles.levelSelect}
+              onChange={selectLevel}
+              disabled={gameStarted}
+            >
+              <option value="easy">easy</option>
+              <option value="medium">medium</option>
+              <option value="hard">hard</option>
+            </select>
+          </div>
           <img src={currentImage} className={styles.hangmanImage} alt="Icon" />
         </div>
         <div className={styles.hintLine}>
