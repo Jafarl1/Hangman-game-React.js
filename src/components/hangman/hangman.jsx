@@ -4,11 +4,12 @@ import Keypad from "../keypad/keypad.jsx";
 import { useState, useEffect } from "react";
 import { list } from "../../db.js";
 import heart from "../../assets/images/heart.png";
-import hangman0 from "../../assets/images/hangman-0.svg";
-import hangman1 from "../../assets/images/hangman-1.svg";
-import hangman2 from "../../assets/images/hangman-2.svg";
-import hangman4 from "../../assets/images/hangman-4.svg";
-import hangman6 from "../../assets/images/hangman-6.svg";
+import restart from "../../assets/images/restart.png";
+import hangman0 from "../../assets/svg/hangman-0.svg";
+import hangman1 from "../../assets/svg/hangman-1.svg";
+import hangman2 from "../../assets/svg/hangman-2.svg";
+import hangman4 from "../../assets/svg/hangman-4.svg";
+import hangman6 from "../../assets/svg/hangman-6.svg";
 
 import styles from "./hangman.module.css";
 
@@ -17,6 +18,7 @@ function Hangman() {
   const [array, setArray] = useState([]);
   const [chancesRemaining, setChancesRemaining] = useState([]);
   const [wrongLimit, setWrongLimit] = useState(0);
+  const [mistakes, setMistakes] = useState([]);
   const [currentImage, setCurrentImage] = useState(hangman0);
 
   useEffect(() => {
@@ -26,23 +28,16 @@ function Hangman() {
   useEffect(() => {
     if (currentWordObject) {
       const length = currentWordObject.word.length;
+      const maxWrongs = Math.floor(length * 0.5);
       setArray(Array(length).fill(""));
-
-      if (length < 5) {
-        setChancesRemaining(Array(2).fill(""));
-        setWrongLimit(2);
-      } else if (length < 9) {
-        setChancesRemaining(Array(3).fill(""));
-        setWrongLimit(3);
-      } else {
-        setChancesRemaining(Array(4).fill(""));
-        setWrongLimit(4);
-      }
+      setChancesRemaining(Array(maxWrongs).fill(""));
+      setWrongLimit(maxWrongs);
     }
   }, [currentWordObject]);
 
   function newGame() {
     setCurrentImage(hangman0);
+    setMistakes([]);
     const randomIndex = Math.floor(Math.random() * list.length);
     setCurrentWordObject(list[randomIndex]);
   }
@@ -114,7 +109,11 @@ function Hangman() {
   function currentLetter(currentWordObject, letter) {
     const newArray = [...array];
 
-    if (!currentWordObject.word.includes(letter)) {
+    if (
+      !currentWordObject.word.includes(letter) &&
+      !mistakes.includes(letter)
+    ) {
+      setMistakes([...mistakes, letter]);
       decreaseLimit();
     }
 
@@ -135,11 +134,27 @@ function Hangman() {
         <div>
           <img src={currentImage} className={styles.hangmanImage} alt="Icon" />
         </div>
-        <h3>{currentWordObject.hint}</h3>
+        <div className={styles.hintLine}>
+          <h3>{currentWordObject.hint}</h3>
+          <button className={styles.restartButton} onClick={newGame}>
+            <img className={styles.restart} src={restart} alt="Restart" />
+          </button>
+        </div>
+
         <div className={styles.life}>
           {chancesRemaining.map((l, i) => (
             <img className={styles.image} key={i} src={heart} alt="Heart" />
           ))}
+          <div className={styles.mistakesTable}>
+            Mistakes ({mistakes.length}):
+            <span className={styles.mistakesList}>
+              {mistakes.map((mistake, i) => (
+                <p key={i} className={styles.mistakeItem}>
+                  {mistake}
+                </p>
+              ))}
+            </span>
+          </div>
         </div>
         <div className={styles.field}>
           {array.map((l, i) => (

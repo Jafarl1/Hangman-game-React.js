@@ -10,6 +10,30 @@
     height: 150px;
   }
 
+  .hintLine {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    .restartButton {
+      width: 30px;
+      height: 30px;
+      border: none;
+      outline: none;
+      background: transparent;
+      cursor: pointer;
+
+      .restart {
+        width: 100%;
+
+        &:active {
+          transition: 0.5s;
+          transform: rotate(360deg);
+        }
+      }
+    }
+  }
+
   .life {
     height: 30px;
     display: flex;
@@ -18,6 +42,23 @@
     .image {
       width: 28px;
       height: 28px;
+    }
+
+    .mistakesTable {
+      display: flex;
+      align-items: center;
+      font-size: 1.4rem;
+      gap: 8px;
+      margin-left: 15px;
+
+      .mistakesList {
+        display: flex;
+        gap: 10px;
+
+        .mistakeItem {
+          text-transform: uppercase;
+        }
+      }
     }
   }
   .field {
