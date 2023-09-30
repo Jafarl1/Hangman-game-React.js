@@ -15,3 +15,43 @@ export const hangmanImages = {
   5: hangman5,
   6: hangman6,
 };
+
+export const getSuitableImagesPack = (limit) => {
+  const imagesPacks = {
+    6: {
+      5: hangmanImages[1],
+      4: hangmanImages[2],
+      3: hangmanImages[3],
+      2: hangmanImages[4],
+      1: hangmanImages[5],
+      0: hangmanImages[6],
+    },
+    5: {
+      4: hangmanImages[1],
+      3: hangmanImages[2],
+      2: hangmanImages[3],
+      1: hangmanImages[4],
+      0: hangmanImages[6],
+    },
+    4: {
+      3: hangmanImages[1],
+      2: hangmanImages[2],
+      1: hangmanImages[4],
+      0: hangmanImages[6],
+    },
+    3: {
+      2: hangmanImages[1],
+      1: hangmanImages[4],
+      0: hangmanImages[6],
+    },
+    2: {
+      1: hangmanImages[1],
+      0: hangmanImages[6],
+    },
+    1: {
+      0: hangmanImages[6],
+    },
+  };
+
+  return imagesPacks[limit];
+};

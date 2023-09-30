@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import styles from "./keypad.module.css";
 
-function Keypad({ currentLetter, currentWordObject }) {
+function Keypad({ handleCurrentLetter, currentWordObject }) {
   const keypadBoard = [..."qwertyuiopasdfghjklzxcvbnm"];
 
   const handleClickOnKeypad = (e) => {
     const value = e.target.innerHTML;
-    currentLetter(currentWordObject, value);
+    handleCurrentLetter(currentWordObject, value);
   };
 
   return (

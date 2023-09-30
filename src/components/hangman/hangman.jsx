@@ -3,8 +3,7 @@
 import Keypad from "../keypad/keypad.jsx";
 import { useState, useEffect } from "react";
 import { list } from "../../db.js";
-
-import { hangmanImages } from "./hangmanImages.js";
+import { hangmanImages, getSuitableImagesPack } from "./hangmanImages.js";
 
 import heart from "../../assets/images/heart.png";
 import restart from "../../assets/images/restart.png";
@@ -13,33 +12,33 @@ import styles from "./hangman.module.css";
 
 function Hangman() {
   const [currentWordObject, setCurrentWordObject] = useState("");
-  const [array, setArray] = useState([]);
+  const [fieldsArray, setFieldsArray] = useState([]);
   const [gameLevel, setGameLevel] = useState("easy");
   const [gameStarted, setGameStarted] = useState(false);
   const [chancesRemaining, setChancesRemaining] = useState([]);
-  const [wrongLimit, setWrongLimit] = useState(0);
   const [mistakes, setMistakes] = useState([]);
+  const [wrongsLimit, setWrongsLimit] = useState(0);
   const [currentImage, setCurrentImage] = useState(hangmanImages[0]);
 
   useEffect(() => {
-    newGame();
+    startNewGame();
   }, []);
 
   useEffect(() => {
     if (currentWordObject && currentWordObject.word.length > 10) {
-      newGame();
+      startNewGame();
     }
 
     if (currentWordObject) {
       const length = currentWordObject.word.length;
       const maxWrongs = determineLimit(gameLevel, length);
-      setArray(Array(length).fill(""));
+      setFieldsArray(Array(length).fill(""));
       setChancesRemaining(Array(maxWrongs).fill(""));
-      setWrongLimit(maxWrongs);
+      setWrongsLimit(maxWrongs);
     }
   }, [currentWordObject, gameLevel]);
 
-  function newGame() {
+  function startNewGame() {
     const randomIndex = Math.floor(Math.random() * list.length);
     setCurrentWordObject(list[randomIndex]);
     setCurrentImage(hangmanImages[0]);
@@ -48,13 +47,13 @@ function Hangman() {
   }
 
   function determineLimit(level, length) {
-    if (level === "easy") {
-      return Math.ceil(length * 0.6);
-    } else if (level === "medium") {
-      return Math.ceil(length * 0.4);
-    } else if (level === "hard") {
-      return Math.ceil(length * 0.2);
-    }
+    const difficultyLevel = {
+      easy: 0.6,
+      medium: 0.4,
+      hard: 0.2,
+    };
+
+    return Math.ceil(length * difficultyLevel[level]);
   }
 
   function selectLevel(e) {
@@ -64,71 +63,30 @@ function Hangman() {
 
   function decreaseLimit() {
     chancesRemaining.pop();
-    gallowDrawing(wrongLimit, chancesRemaining.length);
+    drawingGallow(wrongsLimit, chancesRemaining.length);
   }
 
-  function gallowDrawing(limit, chances) {
-    let hangmanImagesArray;
-
-    if (limit === 6) {
-      hangmanImagesArray = {
-        5: hangmanImages[1],
-        4: hangmanImages[2],
-        3: hangmanImages[3],
-        2: hangmanImages[4],
-        1: hangmanImages[5],
-        0: hangmanImages[6],
-      };
-    } else if (limit === 5) {
-      hangmanImagesArray = {
-        4: hangmanImages[1],
-        3: hangmanImages[2],
-        2: hangmanImages[3],
-        1: hangmanImages[4],
-        0: hangmanImages[6],
-      };
-    } else if (limit === 4) {
-      hangmanImagesArray = {
-        3: hangmanImages[1],
-        2: hangmanImages[2],
-        1: hangmanImages[4],
-        0: hangmanImages[6],
-      };
-    } else if (limit === 3) {
-      hangmanImagesArray = {
-        2: hangmanImages[1],
-        1: hangmanImages[4],
-        0: hangmanImages[6],
-      };
-    } else if (limit === 2) {
-      hangmanImagesArray = {
-        1: hangmanImages[1],
-        0: hangmanImages[6],
-      };
-    } else if (limit === 1) {
-      hangmanImagesArray = {
-        0: hangmanImages[6],
-      };
-    }
+  function drawingGallow(limit, chances) {
+    const hangmanImagesArray = getSuitableImagesPack(limit);
 
     if (chances in hangmanImagesArray) {
       setCurrentImage(hangmanImagesArray[chances]);
       if (chances === 0) {
-        endOfTheGame("lost");
+        finishTheGame("lost");
       }
     }
   }
 
-  function endOfTheGame(result) {
+  function finishTheGame(result) {
     setTimeout(() => {
       alert(`You ${result}`);
-      newGame();
+      startNewGame();
     }, 100);
   }
 
-  function currentLetter(currentWordObject, letter) {
+  function handleCurrentLetter(currentWordObject, letter) {
     setGameStarted(true);
-    const newArray = [...array];
+    const newArray = [...fieldsArray];
 
     if (
       !currentWordObject.word.includes(letter) &&
@@ -138,15 +96,15 @@ function Hangman() {
       decreaseLimit();
     }
 
-    for (let i = 0; i < newArray.length; i++) {
-      if (letter === currentWordObject.word[i] && !newArray[i]) {
-        newArray[i] = letter;
+    for (let index = 0; index < newArray.length; index++) {
+      if (letter === currentWordObject.word[index] && !newArray[index]) {
+        newArray[index] = letter;
         if (!newArray.includes("")) {
-          endOfTheGame("win");
+          finishTheGame("win");
         }
       }
     }
-    setArray(newArray);
+    setFieldsArray(newArray);
   }
 
   return (
@@ -170,20 +128,20 @@ function Hangman() {
         </div>
         <div className={styles.hintLine}>
           <h3>{currentWordObject.hint}</h3>
-          <button className={styles.restartButton} onClick={newGame}>
+          <button className={styles.restartButton} onClick={startNewGame}>
             <img className={styles.restart} src={restart} alt="Restart" />
           </button>
         </div>
 
         <div className={styles.life}>
-          {chancesRemaining.map((l, i) => (
-            <img className={styles.image} key={i} src={heart} alt="Heart" />
+          {chancesRemaining.map((chance, index) => (
+            <img className={styles.image} key={index} src={heart} alt="Heart" />
           ))}
           <div className={styles.mistakesTable}>
             Mistakes ({mistakes.length}):
             <span className={styles.mistakesList}>
-              {mistakes.map((mistake, i) => (
-                <p key={i} className={styles.mistakeItem}>
+              {mistakes.map((mistake, index) => (
+                <p key={index} className={styles.mistakeItem}>
                   {mistake}
                 </p>
               ))}
@@ -191,14 +149,14 @@ function Hangman() {
           </div>
         </div>
         <div className={styles.field}>
-          {array.map((l, i) => (
-            <div className={styles.cell} key={i}>
-              {l}
+          {fieldsArray.map((field, index) => (
+            <div className={styles.cell} key={index}>
+              {field}
             </div>
           ))}
         </div>
         <Keypad
-          currentLetter={currentLetter}
+          handleCurrentLetter={handleCurrentLetter}
           currentWordObject={currentWordObject}
         />
       </div>
