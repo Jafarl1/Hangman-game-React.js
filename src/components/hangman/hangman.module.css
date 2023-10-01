@@ -1,0 +1,116 @@
+select option {
+  background-color: #dbd9d7;
+}
+.hangman {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+
+  .gameTable {
+    display: flex;
+    gap: 60px;
+
+    .levelArea {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .levelH2 {
+        text-align: start;
+        text-transform: uppercase;
+      }
+
+      .levelSelect {
+        height: 30px;
+        font-size: 1rem;
+        background-color: transparent;
+        border: 1px solid black;
+        outline: none;
+        text-transform: capitalize;
+      }
+    }
+
+    .hangmanImage {
+      height: 150px;
+    }
+  }
+
+  .hintLine {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    .restartButton {
+      width: 30px;
+      height: 30px;
+      border: none;
+      outline: none;
+      background: transparent;
+      cursor: pointer;
+
+      .restart {
+        width: 100%;
+
+        &:active {
+          transition: 0.5s;
+          transform: rotate(360deg);
+        }
+      }
+    }
+  }
+
+  .life {
+    height: 30px;
+    display: flex;
+    gap: 15px;
+
+    .image {
+      width: 28px;
+      height: 28px;
+    }
+
+    .mistakesTable {
+      display: flex;
+      align-items: center;
+      font-size: 1.4rem;
+      gap: 8px;
+      margin-left: 15px;
+
+      .mistakesList {
+        display: flex;
+        gap: 10px;
+
+        .mistakeItem {
+          text-transform: uppercase;
+        }
+      }
+    }
+  }
+  .field {
+    display: flex;
+    height: 50px;
+    gap: 10px;
+
+    .cell {
+      width: 30px;
+      height: 30px;
+      border-bottom: 2px solid black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      font-weight: bold;
+      color: rgb(0, 158, 45);
+    }
+  }
+}
+
+@media screen and (max-width: 530px) {
+  .hangman {
+    gap: 10px;
+  }
+}
