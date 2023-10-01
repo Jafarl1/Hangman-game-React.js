@@ -1,11 +1,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import React, { useState } from "react";
+import React from "react";
 import styles from "./keypad.module.css";
 
+const keypadBoard = [..."qwertyuiopasdfghjklzxcvbnm"];
 function Keypad({ handleCurrentLetter, currentWordObject }) {
-  const keypadBoard = [..."qwertyuiopasdfghjklzxcvbnm"];
-
   const handleClickOnKeypad = (e) => {
     const value = e.target.innerHTML;
     handleCurrentLetter(currentWordObject, value);

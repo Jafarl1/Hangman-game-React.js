@@ -20,24 +20,6 @@ function Hangman() {
   const [wrongsLimit, setWrongsLimit] = useState(0);
   const [currentImage, setCurrentImage] = useState(hangmanImages[0]);
 
-  useEffect(() => {
-    startNewGame();
-  }, []);
-
-  useEffect(() => {
-    if (currentWordObject && currentWordObject.word.length > 10) {
-      startNewGame();
-    }
-
-    if (currentWordObject) {
-      const length = currentWordObject.word.length;
-      const maxWrongs = determineLimit(gameLevel, length);
-      setFieldsArray(Array(length).fill(""));
-      setChancesRemaining(Array(maxWrongs).fill(""));
-      setWrongsLimit(maxWrongs);
-    }
-  }, [currentWordObject, gameLevel]);
-
   function startNewGame() {
     const randomIndex = Math.floor(Math.random() * list.length);
     setCurrentWordObject(list[randomIndex]);
@@ -61,11 +43,6 @@ function Hangman() {
     setGameLevel(level.toLowerCase());
   }
 
-  function decreaseLimit() {
-    chancesRemaining.pop();
-    drawingGallow(wrongsLimit, chancesRemaining.length);
-  }
-
   function drawingGallow(limit, chances) {
     const hangmanImagesArray = getSuitableImagesPack(limit);
 
@@ -75,6 +52,11 @@ function Hangman() {
         finishTheGame("lost");
       }
     }
+  }
+
+  function decreaseLimit() {
+    chancesRemaining.pop();
+    drawingGallow(wrongsLimit, chancesRemaining.length);
   }
 
   function finishTheGame(result) {
@@ -106,6 +88,24 @@ function Hangman() {
     }
     setFieldsArray(newArray);
   }
+
+  useEffect(() => {
+    startNewGame();
+  }, []);
+
+  useEffect(() => {
+    if (currentWordObject && currentWordObject.word.length > 10) {
+      startNewGame();
+    }
+
+    if (currentWordObject) {
+      const length = currentWordObject.word.length;
+      const maxWrongs = determineLimit(gameLevel, length);
+      setFieldsArray(Array(length).fill(""));
+      setChancesRemaining(Array(maxWrongs).fill(""));
+      setWrongsLimit(maxWrongs);
+    }
+  }, [currentWordObject, gameLevel]);
 
   return (
     <>
